@@ -1,0 +1,5 @@
+command: php -f
+success: echo "Woohoo!"
+failure: echo "Woohoo!"
+response:
+  255: echo "Here"
