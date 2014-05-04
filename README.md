@@ -22,4 +22,5 @@ Example:
     Fatal error: Call to undefined function Rocket\DB\Config() in /somepath/app.php on line 99
     
     Execution Completed
+    Received a response of: 255
     Took 0.07155585289 seconds
