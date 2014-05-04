@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+import sys, os, re, time
+
+if len(sys.argv) is 1:
+  print "Usage: autorun <file>"
+  exit()
+else:
+  file = sys.argv[1]
+
+try:
+  while True:
+    currenttime = time.time()
+    filetime = os.stat(file).st_mtime
+
+    if filetime > currenttime-1:
+      print "Preparing to run: %s" % file
+      os.system("php -f %s" % file)
+      print "\nExecution Completed"
+      print "Took %s seconds\n\n" % (time.time() - currenttime)
+    time.sleep(1)
+except KeyboardInterrupt:
+  exit()
