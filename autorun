@@ -31,9 +31,7 @@ else:
   file = sys.argv[1]
   track_path = '.'
 
-"""
-Get Config
-"""
+""" Get Config """
 config = ConfigParser.SafeConfigParser()
 config.read('.autorun.conf')
 
@@ -41,9 +39,12 @@ config.read('.autorun.conf')
 """ Read Database Config """
 command = config.get('global', 'command')
 
-"""
-Start loop
-"""
+
+""" Stats """
+stats = {'success': 0, 'fails': 0, 'average_runtime': 0}
+
+
+""" Start loop """
 try:
   while True:
     currenttime = time.time()
@@ -53,30 +54,47 @@ try:
         filetime = os.stat("%s/%s" % (root, tracker)).st_mtime
         if filetime > currenttime-1.5:
           
-          """
-          Start processing the file/command
-          """
+          """ Start processing the file/command """
           print "Change found in: %s" % tracker
           print "Preparing to run: %s" % file
           
-          # os.system("php -f %s" % file)
+          """ Start Benchmark """
+          starttime = time.time()
+
+          """ Run Code """
           return_code = call("%s %s" % (command, file), shell=True)
 
+          """ End Benchmark """
+          endtime = time.time()
+
+          """ Get Runtime """
+          runtime = endtime-starttime
+          stats['average_runtime'] = stats['average_runtime'] + runtime
+
           if return_code is 0:
+            stats['success'] = stats['success'] + 1
             print "Executed Successfully"
 
           elif return_code is 1:
+            stats['fails'] = stats['fails'] + 1
             print "Execution Failed"
 
           else:
+            stats['fails'] = stats['fails'] + 1
             print "Received a response of: %d" % return_code
 
           print "\nExecution Completed"
-          print "Took %s seconds\n%s\n\n" % (time.time() - currenttime, "=" * 40)
+          print "Took %s seconds\n%s\n\n" % (runtime, "=" * 40)
           
           break
         
     time.sleep(1)
 
 except KeyboardInterrupt:
+  print "\n=" * 50
+  print "Total Run Stats"
+  print "=" * 50
+  print "Successes: %s" % stats['success']
+  print "Fails: %s" % stats['fails']
+  print "Average Runtime: %s" % ( stats['average_runtime'] / (stats['success'] + stats['fails']))
   exit()
